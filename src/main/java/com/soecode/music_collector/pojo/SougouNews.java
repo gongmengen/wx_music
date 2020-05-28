@@ -9,6 +9,14 @@ public class SougouNews {
     private boolean isOriginal;
     private String imgUrl;
 
+    public SougouNews() {
+    }
+
+    public SougouNews(String url, String imgUrl) {
+        this.url = url;
+        this.imgUrl = imgUrl;
+    }
+
     public String getName() {
         return name;
     }

@@ -1,5 +1,7 @@
 package com.soecode.music_collector.handler;
 
+import com.geccocrawler.gecco.GeccoEngine;
+import com.geccocrawler.gecco.pipeline.PipelineFactory;
 import com.soecode.music_collector.collector.WxNewsCollector;
 import com.soecode.music_collector.config.Config;
 import com.soecode.music_collector.constants.ResponseConst;
@@ -13,11 +15,18 @@ import com.soecode.wxtools.bean.outxmlbuilder.NewsBuilder;
 import com.soecode.wxtools.exception.WxErrorException;
 import com.soecode.wxtools.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 public class ChangeNewsHandler implements WxMessageHandler {
+
+
+    //加入gecco
+    @Resource
+    protected PipelineFactory springPipelineFactory;
+
 
     private static ChangeNewsHandler instance = null;
 
@@ -87,6 +96,17 @@ public class ChangeNewsHandler implements WxMessageHandler {
     }
 
     private boolean refreshNewsCache(String openid, String keyword, int page) throws IOException {
+        //改用gecco 获取搜狗列表
+        GeccoEngine.create()
+                .pipelineFactory(springPipelineFactory)
+                .classpath("com.soecode.music_collector.gecco.test")
+                .start("https://weixin.sogou.com/weixin?type=2&query="+keyword+"&page="+page+"&ie=utf8")
+                .interval(3000)
+                .loop(true)
+                .start();
+
+
+
         Config.get(openid).setPage(page + 1);
         WxNewsCollector collector = new WxNewsCollector();
         List<SougouNews> sougouNewsList = collector.collect(openid, keyword, page + 1);

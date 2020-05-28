@@ -1,16 +1,35 @@
 package com.soecode.music_collector;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import com.soecode.music_collector.gecco.spring.SpringGeccoEngine;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+import com.geccocrawler.gecco.GeccoEngine;
+
+@SpringBootApplication
+@Configuration
 public class MusicCollectorApplicationTests {
 
-	@Test
-	public void contextLoads() {
+	@Bean
+	public SpringGeccoEngine initGecco() {
+		return new SpringGeccoEngine() {
+			@Override
+			public void init() {
+				GeccoEngine.create()
+						.pipelineFactory(springPipelineFactory)
+						.classpath("com.geccocrawler.gecco.test")
+						.start("https://weixin.sogou.com/weixin?type=2&query=%E5%91%A8%E6%9D%B0%E4%BC%A6")
+						.interval(3000)
+						.loop(true)
+						.start();
+			}
+		};
+	}
+
+	public static void main(String[] args) throws Exception {
+		SpringApplication.run(MusicCollectorApplicationTests.class, args);
 	}
 
 }

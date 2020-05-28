@@ -1,7 +1,9 @@
 package com.soecode.music_collector.collector;
 
+import com.geccocrawler.gecco.GeccoEngine;
 import com.soecode.music_collector.config.Config;
 import com.soecode.music_collector.constants.HttpConst;
+import com.soecode.music_collector.gecco.spring.SpringGeccoEngine;
 import com.soecode.music_collector.pojo.SougouNews;
 import com.soecode.music_collector.util.HttpClientUtil;
 import java.io.IOException;
@@ -12,11 +14,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 public class WxNewsCollector {
-    private static final String SOUGOU_SEARCH_URL = "http://weixin.sogou.com/weixin?query=KEY_WORD&_sug_type_=&sut=28577&lkt=1%2C1524741445786%2C1524741445786&s_from=input&_sug_=y&type=2&sst0=1524741445888&page=PAGE_NUM&ie=utf8&w=01019900&dr=1";
-    private static final String SOUGOU_URL = "https://weixin.sogou.com/";
+    private static final String SOUGOU_SEARCH_URL = "http://weixin.sogou.com/weixin?query=KEY_WORD&type=2";
+    private static final String SOUGOU_URL = "http://weixin.sogou.com/";
 
     public List<SougouNews> collect(String openid, String keyword, int pageNum) throws IOException {
-        String searchUrl = SOUGOU_SEARCH_URL.replace(HttpConst.SOUGOU_SEARCH_KEY_WORD, keyword).replace(HttpConst.SOUGOU_SEARCH_PAGE_NUM, pageNum + "");
+        String searchUrl = SOUGOU_SEARCH_URL.replace(HttpConst.SOUGOU_SEARCH_KEY_WORD, keyword);
         String body = HttpClientUtil.get(searchUrl);
 
         Document doc = Jsoup.parse(body);
@@ -24,16 +26,17 @@ public class WxNewsCollector {
         SougouNews sougouNew;
         List<Element> liElements = doc.select("li[id^=sogou_vr_11002601_box_]");
 
+        //图片以及新闻连接的获取交由gecco
+
         for (Element element : liElements) {
-            String newsUrl = element.select("div[class=txt-box]").select("h3>a").attr("href");
+            String newsUrl = SOUGOU_URL+element.select("div[class=txt-box]").select("h3>a").attr("href");
             if (Config.get(openid).isOriginal() == isOriginal(newsUrl)) {
                 sougouNew = new SougouNews();
                 sougouNew.setKeyword(keyword);
                 sougouNew.setOriginal(Config.get(openid).isOriginal());
                 sougouNew.setName(element.select("div[class=txt-box]").select("h3 > a").text());
                 sougouNew.setDescription(element.text());
-                sougouNew.setImgUrl(element.select("div[class=img-box]").select("a>img").attr("src"));
-                System.out.println(sougouNew.getImgUrl());
+                sougouNew.setImgUrl("https:"+element.select("div[class=img-box]").select("a>img").attr("src"));
                 sougouNew.setUrl(newsUrl);
                 news.add(sougouNew);
             }
