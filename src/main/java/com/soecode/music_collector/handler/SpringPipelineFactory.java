@@ -1,4 +1,4 @@
-package com.soecode.music_collector.gecco.spring;
+package com.soecode.music_collector.handler;
 
 import com.geccocrawler.gecco.pipeline.Pipeline;
 import com.geccocrawler.gecco.pipeline.PipelineFactory;

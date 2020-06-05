@@ -1,9 +1,7 @@
 package com.soecode.music_collector.collector;
 
-import com.geccocrawler.gecco.GeccoEngine;
 import com.soecode.music_collector.config.Config;
 import com.soecode.music_collector.constants.HttpConst;
-import com.soecode.music_collector.gecco.spring.SpringGeccoEngine;
 import com.soecode.music_collector.pojo.SougouNews;
 import com.soecode.music_collector.util.HttpClientUtil;
 import java.io.IOException;
@@ -36,6 +34,9 @@ public class WxNewsCollector {
                 sougouNew.setOriginal(Config.get(openid).isOriginal());
                 sougouNew.setName(element.select("div[class=txt-box]").select("h3 > a").text());
                 sougouNew.setDescription(element.text());
+
+
+                System.out.println("element.text ="+element.text());
                 sougouNew.setImgUrl("https:"+element.select("div[class=img-box]").select("a>img").attr("src"));
                 sougouNew.setUrl(newsUrl);
                 news.add(sougouNew);

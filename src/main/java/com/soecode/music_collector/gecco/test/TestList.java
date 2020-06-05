@@ -2,6 +2,7 @@ package com.soecode.music_collector.gecco.test;
 
 import com.geccocrawler.gecco.annotation.Href;
 import com.geccocrawler.gecco.annotation.HtmlField;
+import com.geccocrawler.gecco.annotation.Image;
 import com.geccocrawler.gecco.annotation.Text;
 import com.geccocrawler.gecco.spider.HtmlBean;
 import lombok.Getter;
@@ -25,12 +26,20 @@ import lombok.Setter;
 public class TestList implements HtmlBean {
 
     @Text
-    @HtmlField(cssPath = "a")
+    @HtmlField(cssPath = "div[class=txt-box]>h3>a")
     String at;
 
-    @Href(click = true)
-    @HtmlField(cssPath = "a")
+    @Href
+    @HtmlField(cssPath = "div[class=txt-box]>h3>a")
     String url;
+
+    @Image({"div[class=img-box]>a>img", "src"})
+    @HtmlField(cssPath="div[class=img-box]>a>img")
+    String imgurl;
+
+    @Text
+    @HtmlField(cssPath = "div[class=txt-box]>p")
+    String p;
 
 
 }

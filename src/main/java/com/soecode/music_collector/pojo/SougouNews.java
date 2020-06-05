@@ -17,6 +17,8 @@ public class SougouNews {
         this.imgUrl = imgUrl;
     }
 
+
+
     public String getName() {
         return name;
     }

@@ -13,7 +13,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Gecco(matchUrl="https://weixin.sogou.com/weixin?type={}&query={}", pipelines="consolePipeline")
+@Gecco(matchUrl="https://weixin.sogou.com/weixin?type={}&query={}", pipelines="myPipeline")
 public class Test implements HtmlBean {
 
 
@@ -29,9 +29,9 @@ public class Test implements HtmlBean {
     @RequestParameter("query")
     private String query;
 
+    @HtmlField(cssPath=".news-list li")
+    public List<TestList> lists;
 
-    @HtmlField(cssPath=".news-list >li>div>h3>a")
-    private List<TestList> lists;
 
 
 

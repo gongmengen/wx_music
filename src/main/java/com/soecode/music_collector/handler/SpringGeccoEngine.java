@@ -1,4 +1,4 @@
-package com.soecode.music_collector.gecco.spring;
+package com.soecode.music_collector.handler;
 
 import com.geccocrawler.gecco.pipeline.PipelineFactory;
 import org.springframework.context.ApplicationListener;
@@ -14,12 +14,12 @@ public abstract class SpringGeccoEngine implements ApplicationListener<ContextRe
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		if(event.getApplicationContext().getParent() == null) {
-			init();
+			init(null,1);
 		}
 	}
 
 	/**
 	 * spring下启动gecco的初始化方法，spring下必须要用非阻塞方式start()运行GeccoEngine
 	 */
-	public abstract void init();
+	public abstract void init(String keyword,int page);
 }
