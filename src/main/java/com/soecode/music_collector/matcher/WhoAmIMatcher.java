@@ -11,6 +11,16 @@ public class WhoAmIMatcher implements WxMessageMatcher{
         if(StringUtils.isNotEmpty(message.getContent())){
             if(message.getContent().equals("我是谁")){
                 return true;
+            }else if (message.getContent().equals("彩蛋")){
+                return true;
+            }else if (message.getContent().equals("窦豆是谁")){
+                return true;
+            }else if (message.getContent().equals("你是谁")){
+                return true;
+            }else if (message.getContent().indexOf("关键词")>-1){
+                return false;
+            }else {
+                return true;
             }
         }
         return false;

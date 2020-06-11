@@ -3,7 +3,9 @@ package com.soecode.music_collector.handler;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.geccocrawler.gecco.GeccoEngine;
+import com.geccocrawler.gecco.dynamic.DynamicGecco;
 import com.geccocrawler.gecco.pipeline.PipelineFactory;
+import com.geccocrawler.gecco.request.HttpGetRequest;
 import com.soecode.music_collector.collector.WxNewsCollector;
 import com.soecode.music_collector.config.Config;
 import com.soecode.music_collector.constants.ResponseConst;
@@ -107,8 +109,11 @@ public class ChangeNewsHandler implements WxMessageHandler {
 
     private boolean refreshNewsCache(String openid, String keyword, int page) throws IOException, InterruptedException {
         //改用gecco 获取搜狗列表
-        this.initGecco().init(keyword,page);
+        //this.initGecco().init(keyword,page);
 
+
+        //动态配置 Gecco
+        spiderGo(keyword,page);
 
 
 
@@ -151,19 +156,77 @@ public class ChangeNewsHandler implements WxMessageHandler {
         }
     }
 
+
+    public void spiderGo(String keyword,int page){
+        SpringPipelineFactory springPipelineFactory = SpringContextUtil.getBean("springPipelineFactory");
+
+        //对应JDPrice类
+        Class<?> sougouList = DynamicGecco.html()
+                .stringField("at").csspath("div[class=txt-box]>h3>a").html(false).build()
+                .stringField("url").csspath("div[class=txt-box]>h3>a").href(false).build()
+                .stringField("imgurl").csspath("div[class=img-box]>a>img").image().build()
+                .stringField("p").csspath("div[class=txt-box]>p").text().build()
+                .register();
+
+
+        DynamicGecco.html()
+                .gecco("https://weixin.sogou.com/weixin?type=2&query="+keyword+"&page="+page, "myPipeline")
+                .field("lists", sougouList).csspath(".news-list li").build()
+                .register();
+
+        HttpGetRequest start = new HttpGetRequest("https://weixin.sogou.com/weixin?type=2&query="+keyword+"&page="+page);
+        start.setCharset("GBK");
+
+
+        GeccoEngine.create()
+                .pipelineFactory(springPipelineFactory)
+                .classpath("com.soecode.music_collector.gecco.test")
+                .start(start)
+                .interval(2000)
+                .run();
+    }
+
+
     @Bean
     public SpringGeccoEngine initGecco() {
         return new SpringGeccoEngine() {
             @Override
             public void init(String keyword,int page) {
                 SpringPipelineFactory springPipelineFactory = SpringContextUtil.getBean("springPipelineFactory");
+
+                //对应JDPrice类
+                Class<?> sougouList = DynamicGecco.html()
+                        .stringField("at").csspath("div[class=txt-box]>h3>a").text().build()
+                        .stringField("url").csspath("div[class=txt-box]>h3>a").href(false).build()
+                        .stringField("imgurl").csspath("div[class=img-box]>a>img").image().build()
+                        .stringField("p").csspath("div[class=txt-box]>p").text().build()
+                        .register();
+
+
+                DynamicGecco.html()
+                        .gecco("https://weixin.sogou.com/weixin?type=2&query="+keyword+"&page="+page, "myPipeline")
+                        .field("lists", sougouList).csspath(".news-list li").build()
+                        .register();
+
+                HttpGetRequest start = new HttpGetRequest("https://weixin.sogou.com/weixin?type=2&query="+keyword+"&page="+page);
+                start.setCharset("GBK");
+
+
                 GeccoEngine.create()
+                        .pipelineFactory(springPipelineFactory)
+                        .classpath("com.soecode.music_collector.gecco.test")
+                        .start(start)
+                        .interval(2000)
+                        .run();
+
+
+                /*                GeccoEngine.create()
                         .pipelineFactory(springPipelineFactory)
                         .classpath("com.soecode.music_collector.gecco.test")
                         .start("https://weixin.sogou.com/weixin?type=2&query="+keyword+"&page="+page)
                         .interval(3000)
                         .loop(false)
-                        .start();
+                        .start();*/
             }
         };
     }
